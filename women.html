@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>Document</title>
+    <link rel="stylesheet" href="./style/style.css">
+    <script src="./js/script.js"></script>
+</head>
+
+<body>
+
+    <iframe class="nav" src="nav.html" frameborder="0" scrolling="no"></iframe>
+    <div class="iframe_blank"></div>
+    <!-- react -->
+    <div id="root"></div>
+    <script src="./js/product.js"></script>
+    <script type="text/babel">
+        const { useState, useMemo } = React
+        const Card = (props) => {
+            const { name, id, tag, price, handleMouseOver, handleMouseOut, handleNum } = props;
+
+            return (
+                <article className="product" >
+                    <a className="cloth" href={`cloth.html?${id}`} target="_top">
+                        <img src={`./images/cloth/cl${id}.webp`} alt="" />
+                        <img src={`./images/cloth/cl${id}-1.webp`} alt="" />
+                        <h2>{name}</h2>
+                    </a>
+                    <h2 className="tag">{tag}</h2>
+                    <div className="price">
+                        <h2>NT.</h2>
+                        <h3>{price}</h3>
+                    </div>
+                    <button className="addcart"
+                        onMouseOver={handleMouseOver}
+                        onMouseOut={handleMouseOut}
+                        onClick={() => handleNum(id)}
+                    ><img src="./images/icon/addcart.png" alt="" /></button>
+                </article>
+            )
+        }
+        const App = () => {
+            const [isHovered, setIsHovered] = useState(false);
+            const [num, setNum] = useState(0);
+            const handleMouseOver = () => {
+                setIsHovered(true);
+            };
+            const handleMouseOut = () => {
+                setIsHovered(false);
+            };
+            const handleNum = (id) => {
+                setNum(num + 1)
+                let cart = localStorage.getItem('cart');
+                if (!cart) {
+                    cart = [];
+                } else {
+                    cart = JSON.parse(cart);
+                }
+                let add = cart.find(k => k.id === id);
+                if (add) {
+                    // 如果商品已經在購物車中，增加數量
+                    add.qty += 1;
+                } else {
+                    // 如果商品不在購物車中，新增商品
+                    add = products.find(k => k.id === id);
+                    add.qty = 1;
+                    cart.push(add);
+                };
+                window.localStorage.setItem('cart', JSON.stringify(cart));
+            };
+            const productF = products.filter(k => k.sex === "女");
+            console.log(productF);
+            const handleSortChange = (event) => {
+                const value = event.target.value;
+                setSortOption(value);
+                if (value === '價格由低到高') {
+                    setAscending(true);
+                } else if (value === '價格由高到低') {
+                    setAscending(false);
+                }
+            };
+            const [sortOption, setSortOption] = useState('最新商品');
+            const [ascending, setAscending] = useState(true);
+            const SortProducts = useMemo(() => {
+                if (sortOption === '最新商品') {
+                    return [...productF]; // 保持原本的排序
+                }
+                return [...productF]
+                    .sort((a, b) => {
+                        return ascending ? a.price - b.price : b.price - a.price;
+                    });
+            }, [ascending, sortOption, productF]);
+            return (
+                <>
+                    <main id="women">
+                        {/* <div className='cart_num'>{num}</div> */}
+                        <div >
+                            <figure id='face1_box' className="face1_box" style={{ display: isHovered || num > 0 ? 'none' : 'block' }}>
+                                <img className="face1" src="./images/logo.png" alt="" />
+                            </figure>
+                            <figure className="face2_box" style={{ display: isHovered || num > 0 ? 'block' : 'none' }}>
+                                <img className="face2" src="./images/face/face.png" alt="" />
+                                <img className="eye_l" src="./images/face/eye.png" alt="" />
+                                <img className="eye_r" src="./images/face/eye.png" alt="" />
+                                <img className="pupil_l" src="./images/face/weed_w.png" alt="" />
+                                <img className="pupil_r" src="./images/face/weed_w.png" alt="" />
+                                <img className="mouth" src="./images/face/mouth.png" alt="" />
+                            </figure>
+                        </div>
+
+                        <section className="category">
+                            <h2>所有商品 / 女裝 / 上著 / 短袖T恤</h2>
+                            <h1>短袖T恤</h1>
+                            <div>
+                                <ul className="page">
+                                    <h3>379</h3>
+                                    <h3>ITEMS</h3>
+                                    <li><a href="#">&lt;</a></li>
+                                    <li><a href="#">1</a></li>
+                                    <li><a href="#">2</a></li>
+                                    <li><a href="#">3</a></li>
+                                    <li><a href="#">4</a></li>
+                                    <li><a href="#">5</a></li>
+                                    <li><a href="#">&gt;</a></li>
+                                </ul>
+                                <form action="">
+                                    {/* 下拉選單 comcobox */}
+                                    <select name="" className="filter" onChange={handleSortChange}>
+                                        <option value="最新商品">最新商品</option>
+                                        <option value="價格由低到高">價格由低到高</option>
+                                        <option value="價格由高到低">價格由高到低</option>
+                                        <option value="熱門商品">熱門商品</option>
+                                    </select>
+                                </form>
+                            </div>
+
+                        </section>
+                        <section className='sale_content'>
+                            {
+                                SortProducts.slice(0, 12).map((p) => {
+                                    return <Card name={p.name} id={p.id} tag={p.tag} price={p.price} key={p.id} handleMouseOver={handleMouseOver}
+                                        handleMouseOut={handleMouseOut}
+                                        handleNum={handleNum}></Card>
+                                })
+                            }
+                        </section>
+
+                        <section className="category">
+                            <div>
+                                <ul className="page">
+                                    <h3>379</h3>
+                                    <h3>ITEMS</h3>
+                                    <li><a href="#">&lt;</a></li>
+                                    <li><a href="#">1</a></li>
+                                    <li><a href="#">2</a></li>
+                                    <li><a href="#">3</a></li>
+                                    <li><a href="#">4</a></li>
+                                    <li><a href="#">5</a></li>
+                                    <li><a href="#">&gt;</a></li>
+                                </ul>
+                                <form action="">
+                                    {/* 下拉選單 comcobox */}
+                                    <select name="" className="filter">
+                                        <option value="價格由低到高">價格由低到高</option>
+                                        <option value="價格由高到低">價格由高到低</option>
+                                        <option value="熱門商品">熱門商品</option>
+                                        <option value="最新商品">最新商品</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </section>
+                    </main>
+                </>
+            )
+        }
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+    <!-- react -->
+    <footer>
+        <iframe class="footer" src="./footer.html" frameborder="0"></iframe>
+    </footer>
+</body>
+
+</html>

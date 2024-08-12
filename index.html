@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>PEKABOO</title>
+    <link rel="icon" href="/logo.ico">
+    <link rel="stylesheet" href="./style/style.css">
+
+
+</head>
+
+<body id="index" onload="loadNav()">
+
+    <header>
+        <div class="index_top " id="index_top">
+            <img src="./images/logo.png" alt="">
+            <img src="./images/text_g.png" alt="pekaboo logo">
+        </div>
+        <div class="blank"></div>
+    </header>
+    <iframe class="nav" id="nav" src="nav.html" frameborder="0" scrolling="no"></iframe>
+    <div class="banner">
+        <div id="carousel">
+            <ul>
+                <li><img src="./images/banner/banner1.webp" alt="" /></li>
+                <li><img src="./images/banner/banner2.webp" alt="" /></li>
+                <li><img src="./images/banner/banner3.webp" alt="" /></li>
+                <li><img src="./images/banner/banner4.webp" alt="" /></li>
+            </ul>
+        </div>
+        <figure id="scene" class="logo">
+            <img data-depth="0.3" class="eye_l_origin" src="./images/logo_0_eye.png" alt="">
+            <img data-depth="0.3" class="eye_r_origin" src="./images/logo_0_eye.png" alt="">
+            <img src="./images/logo_0.png" alt="" />
+        </figure>
+        <figure class="logo_dizzy">
+            <img class="face_dizzy" src="./images/face/face2.png" alt="" />
+            <div>
+                <img class="eye_l_dizzy" src="./images/face/dizzy.png" alt="" />
+                <img class="eye_r_dizzy" src="./images/face/dizzy.png" alt="" />
+                <img class="mouth_dizzy" src="./images/face/mouth2.png" alt="" />
+            </div>
+        </figure>
+    </div>
+    <div class="bg_box rellax" data-rellax-speed="-5">
+        <div class="bg"></div>
+    </div>
+    <!-- react -->
+    <div id="root"></div>
+    <script src="./js/product.js"></script>
+    <script type="text/babel">
+        const { useState } = React
+        const Card = (props) => {
+            const { name, id, tag, price } = props
+
+            return (
+                <article className="product" >
+                    <a className="cloth" href={`cloth.html?${id}`} target="_top">
+                        <img src={`./images/cloth/cl${id}.webp`} alt="" />
+                        <img src={`./images/cloth/cl${id}-1.webp`} alt="" />
+                        <h2>{name}</h2>
+                    </a>
+                    <h2 className="tag">{tag}</h2>
+                    <div className="price">
+                        <h2>NT.</h2>
+                        <h3>{price}</h3>
+                    </div>
+                    <button className="addcart"><img src="./images/icon/addcart.png" alt="" /></button>
+                </article>
+            )
+        }
+        const App = () => {
+            return (
+                <>
+                    <main id="index">
+                        <section className="sale">
+                            <h1 className="title_y">SALE <br />―</h1>
+                        </section>
+                        <section className='sale_content'>
+                            {
+                                products.slice(0, 8).map((p) => {
+                                    return <Card name={p.name} id={p.id} tag={p.tag} price={p.price} key={p.id}></Card>
+                                })
+                            }
+                        </section>
+                        <section className="sale">
+                            <button className="view"><a href="">VIEW MORE</a></button>
+                        </section>
+                        <section className="sale">
+                            <h1 className="title_y">TOP <br />―</h1>
+                        </section>
+                        <section className='sale_content'>
+                            {
+                                products.slice(8, 13).map((p) => {
+                                    return <Card name={p.name} id={p.id} tag={p.tag} price={p.price} key={p.id}></Card>
+                                })
+                            }
+                        </section>
+                        <section className="sale">
+                            <button className="view"><a href="">VIEW MORE</a></button>
+                        </section>
+                    </main>
+                </>
+            )
+        }
+        ReactDOM.createRoot(document.getElementById('root')).render(
+            <App />);
+    </script>
+    <!-- react -->
+
+
+    <footer>
+        <iframe class="footer" src="./footer.html" frameborder="0"></iframe>
+    </footer>
+    <!-- nav_l -->
+    <script src="./js/jquery-1.11.3.min.js"></script>
+    <script src="./js/jquery.jcarousellite.min.js"></script>
+    <script>
+        // window.onload = function () {  /* 方法一 */
+        //     var iframe = document.getElementById('nav');
+        //     var iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+        //     var small_expand = iframeDocument.getElementById('small_expand');
+        //     small_expand.classList.add('shrink');
+        // }
+        function loadNav() {
+            var iframe = document.getElementById('nav');
+            iframe.addEventListener('load', () => {
+                // 向iframe发送消息，通知它要添加shrink类
+                iframe.contentWindow.postMessage({ type: 'addClass', id: 'small_expand', class: 'shrink' }, '*');
+            });
+        }
+       
+        window.addEventListener('scroll', function () {
+            var index_top = document.getElementById('index_top');
+            var iframe = document.getElementById('nav');
+            var scrollHeight = window.scrollY; // 获取滚动的高度
+
+            if (scrollHeight > 250) {
+                index_top.style.height = '0px';
+                iframe.style.top = '0px';
+                iframe.style.position = 'fixed';
+
+                // 发送消息给iframe，调整small_expand的宽度
+                iframe.contentWindow.postMessage({ type: 'updateStyle', id: 'small_expand', style: { width: '200px' } }, '*');
+            } else {
+                index_top.style.height = 250 - scrollHeight + 'px';
+                iframe.style.top = '250px';
+                iframe.style.position = 'absolute';
+
+                // 发送消息给iframe，调整small_expand的宽度
+                iframe.contentWindow.postMessage({ type: 'updateStyle', id: 'small_expand', style: { width: scrollHeight + 'px' } }, '*');
+            }
+        });
+
+        // 处理来自iframe的消息（可选，用于调试）
+        window.addEventListener('message', (event) => {
+            if (event.origin !== 'null' && event.origin !== window.location.origin) {
+                return;
+            }
+            console.log('Received message from iframe:', event.data);
+        });
+        /* function loadNav() {
+            var iframe = document.getElementById('nav');
+            var iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+            var small_expand = iframeDocument.getElementById('small_expand');
+            small_expand.classList.add('shrink');
+        };
+
+        window.addEventListener('scroll', function () {
+            var index_top = document.getElementById('index_top');
+            var iframe = document.getElementById('nav');
+            var iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+            var small_expand = iframeDocument.getElementById('small_expand');
+            var scrollHeight = window.scrollY; // 獲取滾動的高度
+            if (scrollHeight > 250) {
+                index_top.style.height = '0px'; // 當滾動超過 280 時，將高度設置為 0
+                small_expand.style.width = '200px';
+                iframe.style.top = 0 + 'px';
+                iframe.style.position = 'fixed';
+            } else {
+                index_top.style.height = 250 - scrollHeight + 'px'; // 當滾動小於等於 280 時，根據邏輯設置高度
+                small_expand.style.width = scrollHeight + 'px';
+                iframe.style.top = 250 + 'px';
+                iframe.style.position = 'absolute';
+            }
+        }); */
+        document.addEventListener('DOMContentLoaded', function () {
+            const logo = document.querySelector('.logo');
+            const logo_dizzy = document.querySelector('.logo_dizzy');
+            let scrollTimeout;
+            function changeLogo() {
+                logo.style.display = "none";
+                logo_dizzy.style.display = "block";
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    logo.style.display = "block";
+                    logo_dizzy.style.display = "none";
+                }, 700);
+            }
+            window.addEventListener('scroll', changeLogo);
+        });
+
+    </script>
+    <script>
+        $(function () {
+            $('#carousel').jCarouselLite({
+                auto: 3000, //停多久
+                speed: 2000, //移動速度
+                visible: 1,  //顯示幾張
+                scroll: 1    //每次捲動張數
+            });
+        });
+    </script>
+    <script src="./js/parallax.min.js"></script>
+    <script>
+        var scene = document.getElementById('scene');
+        var parallaxInstance = new Parallax(scene);
+    </script>
+    <script src="https://cdn.jsdelivr.net/gh/dixonandmoe/rellax@master/rellax.min.js"></script>
+    <script>
+        // Accepts any class name
+        var rellax = new Rellax('.rellax');
+    </script>
+    <script src="./js/script.js"></script>
+</body>
+
+</html>
